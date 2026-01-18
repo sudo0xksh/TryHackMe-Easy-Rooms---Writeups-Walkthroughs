@@ -1,0 +1,179 @@
+# Bounty Hacker — TryHackMe (Easy) 💰🏴‍☠️🐧
+
+Bounty Hacker is a Linux Easy box that politely hands you the keys and says  
+**“please don’t tell anyone how easy this was.”**
+
+No exploits.  
+No brute-force drama.  
+Just **anonymous FTP, leaked creds, and a misconfigured binary begging to be abused**.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Bounty Hacker  
+Target IP: 10.10.141.37  
+Operating System: Ubuntu-based Linux  
+
+This machine focuses on **service exposure**, **lazy access controls**, and a **GTFOBins special** to finish things off.
+
+Basically: everything attackers love, all in one place.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the ritual scan — because guessing is for amateurs.
+
+nmap -sC -sV -oN nmap.txt 10.10.141.37
+
+Open ports discovered:
+
+21/tcp   FTP     vsftpd 3.0.3 📂  
+22/tcp   SSH     OpenSSH 7.2p2 🔐  
+80/tcp   HTTP    Apache 2.4.18 🌐  
+
+One thing stood out immediately 🚨  
+👉 **Anonymous FTP login was enabled**
+
+At that moment, the rest of the machine mentally checked out.
+
+---
+
+## Web Enumeration (Port 80) 🌐😐
+
+Visited the website.
+
+Found:
+- A very boring page  
+- No input fields  
+- No fun  
+
+Still ran directory enumeration because trust issues.
+
+dirsearch -u http://10.10.141.37 -e php,html,js
+
+Results:
+- Multiple .htaccess paths (403 — rude)  
+- /images/ directory accessible  
+- /server-status present but locked  
+
+Nothing juicy here.  
+The web server was just… existing.
+
+---
+
+## FTP Enumeration (Port 21) 📁😏
+
+FTP deserved attention because **anonymous access was enabled** (red flag the size of a building).
+
+First tried usernames found on the website — no luck.
+
+Then tried the obvious move that somehow everyone forgets:
+
+👉 Anonymous login.
+
+And yes — it worked.
+
+Inside FTP, two files were waiting patiently.
+
+Files downloaded:
+- tasks.txt  
+- locks.txt  
+
+---
+
+## Credential Discovery 🔑📜
+
+Reading the files felt like opening a gift 🎁
+
+tasks.txt:
+- Contained a **valid username**
+
+locks.txt:
+- Contained a **list of passwords**
+- Looked suspiciously like a ready-made wordlist
+
+At this point the machine basically said:  
+**“Please SSH into me.”**
+
+---
+
+## SSH Access (Port 22) 🔓😎
+
+Combined:
+- Username from tasks.txt  
+- Passwords from locks.txt  
+
+Eventually, one password worked.
+
+Result:
+- User-level shell obtained  
+- Partial compromise achieved  
+
+No alerts.  
+No resistance.  
+Just vibes.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+After landing a shell, post-exploitation enumeration began.
+
+Sudo permissions and binary access were checked.
+
+One binary stood out:
+
+👉 **tar**
+
+Instead of trusting it blindly, its behavior was checked on **GTFOBins** (as one should).
+
+And surprise surprise…
+
+tar + elevated permissions = root shell 💀
+
+---
+
+## Privilege Escalation via tar 🧨😈
+
+Using the GTFOBins method, tar was abused to spawn a root shell.
+
+No kernel exploits.  
+No memory corruption.  
+Just **a misconfiguration doing all the work**.
+
+---
+
+## Root Access 🏁👑
+
+- Root shell obtained  
+- Root access confirmed  
+- Full system compromise achieved  
+
+Machine officially buried.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Anonymous FTP is still a security nightmare  
+- Sensitive files don’t belong on public services  
+- Password lists are weapons when attackers find them  
+- Misconfigured binaries turn “low privilege” into “who needs exploits?”  
+- Basic mistakes are enough to lose the entire system  
+
+---
+
+## Final Words ☕😌
+
+Bounty Hacker proves one thing:
+
+> “You don’t need to be a hacker when the system sabotages itself.”
+
+Clean enumeration.  
+Zero creativity required.  
+Free root.
+
+Easy box.  
+Classic mistakes.
