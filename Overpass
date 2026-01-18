@@ -1,0 +1,104 @@
+---
+
+Overpass - TryHackMe Writeup / WalkThrough
+Overpass - THM Writeup
+
+---
+
+Machine Overview
+Machine Name: Overpass
+ Target IP: 10.10.xxx.xxx
+ Operating System: Linux (Ubuntu-based)
+This assessment focused on client-side authentication bypass, credential recovery through exposed cryptographic material, and privilege escalation via a misconfigured cron job.
+
+---
+
+1️⃣ Initial Reconnaissance
+The engagement began with a TCP scan to identify exposed services and understand the attack surface.
+🔍 Nmap Scan
+nmap -sC -sV 10.10.xxx.xxx
+📌 Key Findings
+The following services were identified:
+Port 22 (SSH)
+ Service: OpenSSH 7.6p1
+ OS: Ubuntu Linux
+Port 80 (HTTP)
+ Service: Golang net/http
+ Application: Overpass
+
+The presence of a custom web application on port 80 made HTTP the primary entry point.
+
+---
+
+2️⃣ Web Application Analysis
+Accessing the web application revealed a login interface.
+Rather than attacking the backend directly, the client-side logic was reviewed.
+ During this analysis, a flaw was identified in login.js, where authentication relied on the presence of a session token rather than proper server-side validation.
+By manually crafting a cookie header with a value such as:
+Session: #anything
+Administrative access was granted without valid credentials.
+This confirmed a client-side authentication bypass.
+
+---
+
+3️⃣ Admin Panel Access
+With access to the admin panel, sensitive internal resources became visible.
+One of the most critical discoveries was an RSA private key exposed within the administrative interface.
+This key appeared to belong to a system user.
+
+---
+
+4️⃣ Credential Recovery & Initial Access
+The retrieved private key was associated with user james and protected by a passphrase.
+After recovering the passphrase, SSH access was attempted using the private key.
+The login was successful, resulting in a stable user-level shell.
+At this point:
+Initial foothold obtained
+user.txt flag retrieved and submitted
+
+---
+
+5️⃣ Post-Exploitation Enumeration
+Once inside the system, standard enumeration techniques were performed.
+A critical misconfiguration was identified in the system's scheduled tasks.
+A cron job was running with root privileges every minute:
+* * * * * root curl overpass.thm/downloads/src/buildscript.sh | bash
+
+This job blindly downloaded and executed a script from a remote location without validation.
+
+---
+
+6️⃣ Privilege Escalation via Cron Job Abuse
+Because the script was fetched over HTTP and executed as root, control over the script source meant control over root execution.
+By modifying the contents of buildscript.sh to include a malicious payload, arbitrary commands could be executed as root.
+Once the cron job ran, the payload executed automatically.
+
+---
+
+7️⃣ Root Access
+
+Root access obtained
+root.txt flag retrieved and submitted
+Full system compromise confirmed
+
+This concluded the assessment.
+
+---
+
+🧠 Key Takeaways
+
+Client-side authentication checks should never be trusted
+Exposing cryptographic keys is equivalent to exposing credentials
+Passphrase-protected keys still pose a risk if accessible
+Cron jobs executing remote scripts are extremely dangerous
+Trusting external content with root privileges leads to immediate compromise
+
+---
+
+📬 Contact & Projects
+Email: dakshbaweja20@gmail.com
+ GitHub: https://github.com/sudo0xksh
+🚀 Deteroid
+Deteroid is a dedicated review platform for bug bounty hunters to share insights, rate programs, and collaborate on cybersecurity findings.
+ Empowering ethical hackers with community-driven intel to hunt bugs smarter.
+📸 Instagram: https://www.instagram.com/deteroids/
