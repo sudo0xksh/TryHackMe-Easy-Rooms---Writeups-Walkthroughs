@@ -1,0 +1,207 @@
+# Cyborg — TryHackMe (Easy) 🤖💾🐧
+
+Cyborg is one of those machines that doesn’t get hacked —  
+it **slowly explains itself** until you accidentally become root.
+
+No flashy exploits.  
+No kernel panic.  
+Just backups, hashes, and a script that should’ve never seen sudo.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Cyborg  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine is all about **web enumeration**, **backup archive abuse**,  
+**credential recovery**, and a **backup script that chose violence**.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the usual “what did you expose?” scan.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Services discovered:
+
+22/tcp   SSH     OpenSSH 7.2p2 🔐  
+80/tcp   HTTP    Apache 2.4.18 🌐  
+
+Linux 4.x kernel detected.  
+Only SSH and HTTP exposed — clean, boring, suspicious.
+
+---
+
+## Web Enumeration (Port 80) 🌐🧐
+
+Visiting the website showed…  
+👉 **Default Apache page**
+
+Nothing custom.  
+Nothing exciting.  
+Which usually means the good stuff is hiding somewhere else.
+
+Further enumeration revealed something interesting 👀
+
+A password hash casually sitting around:
+
+music_archive:$apr1$BpZ.Q.1m$F0qqPwHSOG50URuOVQTTn.
+
+At the time it didn’t unlock anything,  
+but it smelled like **“this will matter later.”**
+
+And it did 😏
+
+---
+
+## User Enumeration & Archive Discovery 📁🕵️‍♂️
+
+While digging deeper, multiple usernames popped up:
+
+- josh  
+- adam  
+- alex  
+
+Also found something far more exciting:
+
+👉 **archive.tar**
+
+Downloaded it immediately because nothing good ever comes from random archives.
+
+Inside the extracted data were config files referencing backup-related structures.
+
+Attack path officially changed direction.
+
+---
+
+## Backup Technology Identification 🧠💾
+
+Looking at the archive structure raised a familiar flag 🚩
+
+This wasn’t random junk —  
+👉 It was **Borg Backup**.
+
+Instead of hunting for bugs, the focus shifted to understanding how Borg works.
+
+Turns out:
+- Borg repositories are usually protected by **passphrases**
+- No exploit needed — just the right password
+
+So… back to that hash 👀
+
+---
+
+## Credential Recovery 🔑🧨
+
+The earlier hash was revisited and identified as an **APR (MD5) hash**.
+
+After controlled cracking attempts:
+
+Recovered credentials:
+
+music_archive : squidward
+
+Using this password, the Borg backup repository was successfully extracted.
+
+And inside it…  
+things escalated quickly.
+
+---
+
+## Initial Access 🔓😎
+
+Within the extracted backup data, a file inside **alex’s directory** revealed:
+
+alex : S3cretP@s3
+
+Tried SSH with these creds.
+
+Result?
+
+✅ Login successful  
+✅ User shell obtained  
+✅ user.txt flag captured  
+
+Partial compromise achieved.  
+Time to annoy sudo.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration revealed something spicy 🌶️
+
+The current user could run a script as root:
+
+👉 **backup.sh**
+
+Direct editing? ❌  
+Permissions? Locked.
+
+But scripts don’t need editing to be dangerous 😈
+
+Reviewing the logic showed that it executed commands in a way that allowed  
+**arbitrary command execution as root** if you knew how to talk to it nicely.
+
+So we did.
+
+---
+
+## Root Access 🏁👑
+
+By abusing the script’s execution flow:
+
+- Root-level command execution achieved  
+- Root shell obtained  
+- root.txt flag captured  
+
+Machine officially dismantled.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Default web pages often hide clues elsewhere  
+- Password hashes found early can decide the entire attack chain  
+- Backups deserve stronger protection than production  
+- Understanding systems beats exploit hunting  
+- Sudo + scripts = instant regret  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel** to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+Cyborg teaches a simple lesson:
+
+> “If your backups are weak, your system already lost.”
+
+Calm enumeration.  
+Basic understanding.  
+Free root.
+
+Easy box.  
+Dangerous assumptions.
