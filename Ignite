@@ -1,0 +1,188 @@
+# Ignite — TryHackMe (Easy) 🔥💻🐧
+
+Ignite is that box which doesn’t even try to hide.  
+It literally tells you **which CMS it’s running**, keeps **default creds**,  
+and then politely allows **RCE + root**.
+
+No puzzles.  
+No resistance.  
+Just bad decisions, stacked neatly.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Ignite  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine focuses on **CMS identification**, **remote code execution**,  
+and **privilege escalation via exposed configuration files**.
+
+In short: the CMS did all the work for us.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the standard scan to see what the server exposed.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Service discovered:
+
+80/tcp   HTTP   Apache 2.4.18 🌐  
+Application: **Fuel CMS** ⛽🔥  
+
+The CMS was visible straight away, which instantly narrowed the attack surface.
+
+When a box tells you the tech stack upfront,  
+it’s usually about to regret it.
+
+---
+
+## Web Enumeration (Port 80) 🌐🧐
+
+Directory enumeration was performed to locate admin panels and hidden paths.
+
+Interesting endpoints discovered:
+
+/home  
+/index.php  
+/offline  
+/robots.txt  
+
+robots.txt was especially helpful (as usual).
+
+Inside it, a disallowed path stood out:
+
+👉 **/fuel**
+
+Which just happened to be the Fuel CMS admin panel.
+
+Subtlety level: zero.
+
+---
+
+## CMS Access 🔑😎
+
+Navigated to `/fuel` and found the login page.
+
+Even better — the homepage casually revealed **default credentials**  
+that were still active 🤦‍♂️
+
+Username: admin  
+Password: admin  
+
+Logged in successfully.
+
+At this point, the CMS was completely exposed to authenticated attacks.
+
+---
+
+## Remote Code Execution 💣🔥
+
+The target was running **Fuel CMS version 1.4**,  
+a version known for having **remote code execution vulnerabilities**.
+
+Abused the RCE to gain command execution on the system.
+
+Result:
+- Reverse shell obtained  
+- Initial foothold achieved  
+
+Web app officially on fire 🔥
+
+---
+
+## Post-Exploitation Enumeration 🔎🧠
+
+After landing on the box, privilege escalation was evaluated.
+
+Considered:
+- pkexec (CVE-2021-4034) ❌ not vulnerable  
+
+Instead of forcing kernel exploits, the smarter move was to look back at:
+
+👉 **Application files**
+
+Because apps love leaking secrets.
+
+---
+
+## Credential Discovery 🔑📜
+
+Inside the web application files, a familiar mistake was found.
+
+A configuration file:
+
+👉 **database.php**
+
+And inside it?
+
+Plaintext database credentials 😌
+
+These credentials belonged to a **privileged user**  
+and were reusable directly on the system.
+
+---
+
+## Privilege Escalation 🚀👑
+
+Using the credentials extracted from the configuration file:
+
+- Privileged access obtained  
+- Root shell achieved  
+- Root flag captured  
+
+Full system compromise completed.
+
+No kernel bugs.  
+No exploit chains.  
+Just exposed configs doing their thing.
+
+---
+
+## Key Takeaways 🧠📌
+
+- CMS identification during recon saves massive effort  
+- Default credentials are still everywhere (somehow)  
+- Outdated CMS versions often equal instant RCE  
+- Configuration files are treasure chests for attackers  
+- Application misconfigurations beat kernel exploits every time  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+Ignite teaches one brutal lesson:
+
+> “If your CMS is outdated, your server is already compromised.”
+
+Fast recon.  
+Zero resistance.  
+Free root.
+
+Easy box.  
+Classic mistakes.
