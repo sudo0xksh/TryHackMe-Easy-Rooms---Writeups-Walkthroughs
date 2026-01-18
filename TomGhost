@@ -1,0 +1,211 @@
+# TomGhost — TryHackMe (Easy) 👻🐱‍👤🔥
+
+TomGhost is that box where Tomcat decides to become Casper  
+and starts **leaking files from the afterlife**.
+
+AJP exposed.  
+Ghostcat alive.  
+Credentials flying around.  
+Sudo doing dumb things.
+
+Clean. Classic. Dangerous.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: TomGhost  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine revolves around **Apache Tomcat misconfiguration**,  
+**Ghostcat (CVE-2020-1938)** abuse, **credential harvesting**,  
+and a **GTFOBins-certified sudo escalation** to finish strong.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the usual “what did you leave open?” scan.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Services discovered:
+
+22/tcp    SSH     OpenSSH 7.2p2 🔐  
+53/tcp    DNS     tcpwrapped 🌐  
+8009/tcp  AJP     Apache Jserv Protocol 1.3 👻  
+8080/tcp  HTTP    Apache Tomcat 9.0.30 🐱  
+
+The moment **AJP (8009)** and **Tomcat (8080)** showed up together,  
+the box basically whispered:
+
+👉 *“Ghostcat me exploit kar.”*
+
+---
+
+## Service Analysis 🧠🔎
+
+SSH enumeration was tested briefly:
+
+- Version was old  
+- Username enumeration behaved inconsistently  
+
+Conclusion:
+👉 SSH is not the entry point today.
+
+Attention fully shifted to Tomcat.
+
+---
+
+## Tomcat Vulnerability Identification 👻📚
+
+Tomcat version **9.0.30** is vulnerable to:
+
+👉 **CVE-2020-1938 — Ghostcat**
+
+This vulnerability allows **arbitrary file read** via the AJP connector  
+when misconfigured.
+
+Conditions were perfect:
+- AJP exposed  
+- Tomcat accessible  
+- Security expectations low  
+
+Green light.
+
+---
+
+## Exploitation via AJP (Ghostcat) 👻💣
+
+Abused the AJP connector to read internal files from Tomcat.
+
+And as always…  
+someone left credentials behind.
+
+Leaked credentials:
+
+skyfuck : 8730281lkjlkjdqlksalks  
+
+Straight out of the server’s soul.
+
+---
+
+## Initial Access via SSH 🔑😎
+
+Tried SSH using the recovered credentials.
+
+Result?
+
+✅ Login successful  
+✅ User shell obtained  
+✅ user.txt flag captured  
+
+Foothold achieved without brute force or guessing.
+
+---
+
+## Post-Exploitation Enumeration 🔎🧠
+
+Standard checks followed:
+
+- sudo access ❌ not available  
+- SUID binaries ❌ nothing interesting  
+
+But filesystem enumeration never disappoints.
+
+Found something spicy 👀
+
+👉 An **encrypted PGP file**
+
+Which usually means:
+“there’s another user hiding somewhere.”
+
+---
+
+## Lateral Movement 🔄🧙‍♂️
+
+Extracted and cracked the PGP file.
+
+Recovered credentials for another user:
+
+👉 **merlin**
+
+Switched to the merlin account.
+
+Then ran:
+
+sudo -l
+
+And suddenly… everything changed 😈
+
+---
+
+## Privilege Escalation 🚀🔥
+
+The **zip** binary was allowed to run with sudo privileges.
+
+zip looks harmless.  
+zip is not harmless.
+
+Checked GTFOBins.
+
+GTFOBins smiled back 😏
+
+Using the known technique, zip was abused to execute commands as root.
+
+---
+
+## Root Access 🏁👑
+
+- Root shell obtained  
+- Root privileges confirmed  
+- root.txt flag captured  
+
+Machine officially exorcised.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Exposed AJP connectors are extremely dangerous  
+- Ghostcat is a reminder that configs matter more than patches  
+- Credentials leak faster than people expect  
+- Encrypted files often enable lateral movement  
+- “Safe” binaries become deadly with sudo  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+TomGhost proves one timeless lesson:
+
+> “If AJP is exposed, Tomcat will haunt you.”
+
+Clean enumeration.  
+One good CVE.  
+Free root.
+
+Easy box.  
+Very real mistakes.
