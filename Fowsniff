@@ -1,0 +1,219 @@
+# Fowsniff CTF — TryHackMe (Easy) 📧🐶🔐
+
+Fowsniff CTF is a box that doesn’t get hacked aggressively —  
+it **leaks credentials politely** and waits for you to notice.
+
+Mail services, leaked passwords, username enumeration,  
+and a script that really shouldn’t be executable.
+
+Classic. Messy. Fun.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Fowsniff CTF  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine focuses on **multi-service enumeration**,  
+**credential harvesting from public leaks**,  
+and **privilege escalation via insecure script execution**.
+
+In short: everyone reused passwords and paid for it.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with a standard TCP scan to see what the server proudly exposed.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Services discovered:
+
+22/tcp   SSH     OpenSSH 7.2p2 🔐  
+80/tcp   HTTP    Apache 2.4.18 🌐  
+110/tcp  POP3    Dovecot 📬  
+143/tcp  IMAP    Dovecot 📬  
+
+Mail services + SSH + HTTP together is a giant neon sign saying:
+
+👉 **“Credentials are involved. Go find them.”**
+
+---
+
+## Web Enumeration (Port 80) 🌐🧐
+
+Directory enumeration was performed on the web service.
+
+Findings:
+- Directory listing enabled on some paths 📂  
+- Old jQuery version (1.11.3) 🦖  
+- robots.txt present but boring 😴  
+
+No direct credentials here,  
+but the site clearly confirmed the **identity and theme** of the target.
+
+Which mattered later.
+
+---
+
+## Username Enumeration via SSH 👤🔎
+
+SSH behaved… suspiciously.
+
+By observing authentication responses,  
+valid usernames could be distinguished from invalid ones.
+
+Confirmed usernames included:
+
+- admin  
+- root  
+- www-data  
+- host  
+- user  
+- guest  
+
+This alone cut the attack complexity in half.
+
+Usernames confirmed = attackers smiling 😈
+
+---
+
+## Mail Service Enumeration (POP3 & IMAP) 📬🧠
+
+With POP3 and IMAP exposed, targeted enumeration followed.
+
+- Brute-force attempts kept minimal (slow responses, rate limits)  
+- Authentication clearly enabled  
+- No instant creds from brute forcing  
+
+So instead of forcing services, the strategy changed:
+
+👉 **Look outside the box.**
+
+And that’s where things got spicy 🌶️
+
+---
+
+## Credential Discovery via Data Leakage 🕵️‍♂️🔥
+
+Research related to the target revealed a **publicly leaked dataset**  
+containing email addresses and password hashes tied to the organization.
+
+Example entries:
+
+baksteen@fowsniff : 19f5af754c31f1e2651edde9250d69bb  
+seina@fowsniff    : 90dc16d47114aa13671c697fd506cf26  
+
+After identifying the hash format and cracking carefully:
+
+Recovered credential:
+
+seina : scoobydoo2 🐶
+
+This confirmed one thing:
+
+👉 **The leak was real, and the system trusted it.**
+
+---
+
+## Initial Access via SSH 🔓😎
+
+Using the leaked password logic, SSH access was attempted with another user.
+
+Valid credentials used:
+
+Username: baksteen  
+Password: S1ck3nBluff+secureshell  
+
+Login result?
+
+✅ Success  
+✅ User shell obtained  
+✅ Initial foothold secured  
+
+No alarms.  
+No resistance.  
+Just password reuse doing its thing.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration focused on files executable by the user’s group.
+
+Command used:
+
+find / -type f -perm -010 -group $(id -gn) -ls 2>/dev/null
+
+This revealed something dangerous 👀
+
+A script named:
+
+👉 **cube.sh**
+
+- Executable by the current group  
+- Running with elevated privileges  
+
+Which is basically root access with extra steps.
+
+---
+
+## Root Access 🏁👑
+
+By injecting a reverse shell payload into the script  
+and triggering its execution:
+
+- Root shell obtained  
+- Root privileges confirmed  
+- Full system compromise achieved  
+
+Machine officially done.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Mail services often mean credential reuse  
+- Username enumeration saves massive time  
+- Public credential leaks stay valid longer than people think  
+- Group-executable scripts are privilege escalation gold  
+- Correlating data beats brute force every time  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not louder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+Fowsniff CTF proves one thing:
+
+> “If your passwords leak once, they’ll betray you forever.”
+
+Smart enumeration.  
+Outside-the-box thinking.  
+Free root.
+
+Easy box.  
+Real-world mistakes.
