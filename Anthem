@@ -1,0 +1,193 @@
+# ANTHEM — TryHackMe (Easy) 🎶💀🪟
+
+ANTHEM is a Windows-based Easy box that proudly teaches one core lesson:
+
+> **If you hide passwords in robots.txt, attackers don’t need exploits — they need eyes.**
+
+No payload crafting.  
+No memory corruption.  
+Just **criminally bad configuration choices** and oversharing at its finest.
+
+---
+
+## Machine Overview 🖥️📌
+
+Target IP: 10.80.142.4  
+Operating System: Windows (very likely Windows Server 2019)
+
+This machine revolves around **web-based information disclosure**, which eventually snowballs into **RDP access and full Administrator compromise**.
+
+Basically: the box leaks everything… politely.
+
+---
+
+## Initial Reconnaissance 🔍👣
+
+Started with a full TCP scan to see what the target decided to expose to the world.
+
+nmap -sC -sV -oN nmap.txt 10.80.142.4
+
+Open ports discovered:
+
+80/tcp   HTTP   Microsoft HTTPAPI httpd 2.0 🌐  
+3389/tcp RDP    Microsoft Terminal Services 🔑  
+
+Extra goodies collected for free:
+
+Hostname: WIN-LU09299160F  
+OS Guess: Windows Server 2019 (high confidence)  
+Product Version: 10.0.17763  
+RDP Certificate CN: WIN-LU09299160F  
+
+Only HTTP and RDP exposed — which immediately screamed:
+
+👉 **“Steal creds from the website, then walk in through RDP.”**
+
+---
+
+## Attack Strategy 🧠🎯
+
+RDP was exposed but locked behind credentials.  
+So the plan was simple:
+
+**Abuse the website → steal credentials → RDP → win.**
+
+No detours.  
+No overthinking.  
+Port 80 became the main character.
+
+---
+
+## Web Enumeration (Port 80) 🌐🧐
+
+Visiting the site revealed it was running **Umbraco CMS**, a .NET-based CMS commonly found on Windows servers.
+
+Instead of attacking Umbraco itself, the focus shifted to something much easier:
+
+👉 **Content inspection & misconfigurations**  
+(Because developers love leaking secrets in plain sight.)
+
+---
+
+## Information Disclosure via Content 🧾🚨
+
+The website was basically playing hide-and-seek with flags… very badly.
+
+What was found:
+
+- Two flags hidden inside HTML meta tags 🏷️  
+- One flag chilling inside the search bar placeholder 🔎  
+- One flag embedded directly in page source 💬  
+
+At this point, the site had already failed basic hygiene checks.
+
+But it got worse.
+
+---
+
+## robots.txt — The Hall of Shame 🤡📄
+
+Checked robots.txt because… of course.
+
+And found something beautiful:
+
+👉 **The admin password. In plaintext.**  
+
+Yes.  
+In robots.txt.  
+On the internet.
+
+To make things even funnier, a poem on the website revealed:
+
+- The author name = admin username/email  
+
+So now we had:
+- Admin username ✅  
+- Admin password ✅  
+
+Attack difficulty dropped to **zero**.
+
+---
+
+## Initial Access via RDP 🔐😎
+
+With valid credentials in hand, RDP access was attempted.
+
+xfreerdp3 /u:sg /p:[password] /v:10.80.142.4 /drive:/tmp /cert:ignore +clipboard
+
+Connection result?
+
+✅ Successful  
+❌ Security  
+💀 Sysadmin pride  
+
+User-level access achieved.
+
+---
+
+## Post-Exploitation Enumeration 🔎📂
+
+After landing on the box, enumeration continued.
+
+During filesystem exploration, a **hidden backup directory** was discovered.
+
+Inside it:
+
+restore.txt 👀
+
+Observations:
+- Permissions were overly permissive  
+- Current user (sg) could modify access controls  
+
+Backup files + bad permissions = incoming disaster.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Permissions on restore.txt were modified to allow full access.
+
+Inside the file?
+
+👉 **Administrator credentials.**  
+
+Because why protect backups, right?
+
+---
+
+## Administrator Access 🏁👑
+
+Using the newly discovered Administrator credentials:
+
+- New RDP session initiated  
+- Administrator access confirmed  
+- Full system control achieved  
+
+Root flag located and submitted.
+
+Machine status: **Absolutely owned.**
+
+---
+
+## Key Takeaways 🧠📌
+
+- Exposed RDP is dangerous when credentials are handled like jokes  
+- robots.txt is NOT a password manager  
+- CMS content can leak far more than intended  
+- Backup files with bad permissions are privilege escalation gold  
+- No exploits were harmed in the making of this compromise  
+
+---
+
+## Final Words ☕😌
+
+ANTHEM is proof that:
+
+> “Attackers don’t always hack — sometimes they just read.”
+
+Clean enumeration.  
+Basic curiosity.  
+Free admin access.
+
+Easy box.  
+Embarrassing mistakes.
