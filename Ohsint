@@ -1,0 +1,172 @@
+# OhSINT — TryHackMe (OSINT) 🕵️‍♂️🌍🧩
+
+OhSINT was my **first OSINT-based CTF**, and it made one thing very clear:
+
+> You don’t need exploits when people leak their lives online.
+
+No ports.  
+No shells.  
+No payloads.
+
+Just public data, bad habits, and patience.
+
+---
+
+## Challenge Overview 📌🔍
+
+This challenge focused entirely on **Open-Source Intelligence (OSINT)**.
+
+Goal (on paper):
+👉 Collect publicly available information and correlate it to uncover sensitive details.
+
+Reality:
+👉 Tiny leaks. Multiple platforms. One careless human.
+
+---
+
+## Initial Footprint Discovery 👣📱
+
+The investigation began with identifying the target’s online presence.
+
+The first strong lead came from **Twitter** 🐦
+
+From the account:
+- Posting patterns  
+- Technical references  
+- Casual mentions  
+
+These details helped build a baseline profile of the target.
+
+Nothing dangerous alone —  
+but OSINT is about **patterns**, not single posts.
+
+---
+
+## Wireless Metadata Exposure 📡😬
+
+While scrolling through posts, something spicy appeared 👀
+
+👉 A **BSSID** was unintentionally disclosed.
+
+This might look harmless, but in OSINT:
+
+BSSID = location breadcrumb 🧠
+
+Using public wireless databases:
+- The associated **SSID** was identified  
+- The **geographical location** of the network was mapped  
+
+Physical location: narrowed.  
+Confidence level: rising.
+
+---
+
+## Location Correlation 🌍✈️
+
+With location data in hand, correlation began.
+
+The target maintained a **personal website** where:
+- Travel experiences were shared  
+- A recent vacation location was mentioned  
+
+Cross-referencing this with the wireless data confirmed consistency.
+
+OSINT rule #1:
+👉 If multiple sources agree, you’re probably right.
+
+---
+
+## Developer Footprint Analysis 💻🔎
+
+Next stop: technical platforms.
+
+A **GitHub profile** linked to the target was discovered.
+
+From GitHub:
+- Email address exposed 📧  
+- Repository history visible  
+- Activity timeline mapped  
+
+Digital footprint expanded nicely.
+
+---
+
+## Credential Exposure 🔑💀
+
+Then came the real facepalm moment 🤦‍♂️
+
+While reviewing the target’s website more closely:
+
+👉 Page source revealed a **plaintext password**
+
+No obfuscation.  
+No hashing.  
+Just vibes.
+
+At this point, the challenge was basically done.
+
+---
+
+## Outcome 🏁✅
+
+By correlating:
+
+- Social media behavior  
+- Wireless metadata  
+- Location intelligence  
+- Developer platform exposure  
+- Horrible credential hygiene  
+
+The objective was completed using **only public information**.
+
+No exploitation.  
+No brute force.  
+No illegal access.
+
+Just OSINT doing what it does best.
+
+---
+
+## Key Takeaways 🧠📌
+
+- OSINT is about correlation, not complexity  
+- Small leaks across platforms compound fast  
+- Metadata (like BSSID) is dangerous  
+- Developers overshare more than they realize  
+- Security failures usually start *before* hacking  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+OhSINT proves one brutal truth:
+
+> “People leak more than systems ever will.”
+
+No hacks.  
+No tools.  
+Just attention to detail.
+
+OSINT box.  
+Real-world lesson.
