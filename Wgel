@@ -1,0 +1,202 @@
+# Wgel CTF — TryHackMe (Easy) 🧇🔑🐧
+
+Wgel CTF is that box which tests **patience more than payloads**.  
+Slow website.  
+Random disconnects.  
+And then suddenly… a private SSH key just chilling in public.
+
+No exploits.  
+No brute force.  
+Just information disclosure doing overtime.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Wgel CTF  
+Target IP: 10.10.xxx.xxx (changes more than moods)  
+Operating System: Ubuntu-based Linux  
+
+This machine focuses on **web enumeration**, **source code analysis**,  
+**SSH key abuse for initial access**, and a **creative sudo misuse** to wrap things up.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the usual recon ritual.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Services discovered:
+
+22/tcp   SSH     OpenSSH 7.2p2 🔐  
+80/tcp   HTTP    Apache 2.4.18 🌐  
+
+Only SSH and HTTP exposed.  
+Which usually means:  
+👉 *“The website knows something.”*
+
+---
+
+## Initial Enumeration Challenges 😤🐢
+
+Enumeration wasn’t smooth at first.
+
+- Automated directory tools ❌ unreliable  
+- Website ❌ slow and unstable  
+
+Instead of forcing scans, the smart move was made:
+
+👉 Disconnect. Reconnect later. Chill.
+
+After reconnecting, the target behaved and enumeration resumed normally.
+
+Lesson learned: sometimes **patience > tools**.
+
+---
+
+## Web Application Enumeration 🌐🧐
+
+Further inspection revealed content under:
+
+👉 **/sitemap/**
+
+Inside it were multiple names, likely users:
+
+- Dave Miller  
+- Emily Turner  
+- Adam Morris  
+- Noah Nelson  
+- Dorothy Murphy  
+
+Nothing worked immediately,  
+but it confirmed **user information leakage** through the web app.
+
+---
+
+## Source Code Analysis 🧠💻
+
+Digging into the page source (because trust issues) paid off.
+
+Found a more interesting username:
+
+👉 **jesse**
+
+Unlike the others, this one appeared in a technical context.
+
+Red flag 🚩 raised.
+
+Continued poking revealed something far worse.
+
+---
+
+## SSH Key Disclosure 🔑💀
+
+Further enumeration exposed a private SSH key sitting inside a **.ssh directory**.
+
+Yes.  
+A private key.  
+Publicly accessible.
+
+Security score: zero.
+
+Used the key to attempt SSH access.
+
+Result?
+
+✅ Login successful  
+✅ User shell obtained  
+
+Authentication bypassed without passwords or guessing.
+
+---
+
+## Initial Foothold 🐾😎
+
+At this point:
+
+- Initial access established  
+- user.txt flag captured  
+
+The box officially belonged to us.
+
+Time to mess with sudo.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration revealed a spicy sudo rule:
+
+👉 The user could run **wget** as root.
+
+wget doesn’t look dangerous…  
+until you remember what it can do.
+
+Checked behavior.  
+Checked GTFOBins.
+
+Smile activated 😈
+
+---
+
+## Root Flag Exfiltration 📤👑
+
+Using wget’s `--post-file` functionality:
+
+- Root flag contents were exfiltrated  
+- Sent directly to a controlled Netcat listener  
+
+Result:
+- Root flag obtained  
+- Root access effectively achieved  
+- Full system compromise confirmed  
+
+Who needs a shell when you can steal data quietly?
+
+---
+
+## Key Takeaways 🧠📌
+
+- Slow or unstable services sometimes need patience, not brute force  
+- Source code leaks are extremely powerful  
+- Exposed SSH private keys are game over  
+- “Safe” binaries like wget become weapons with sudo  
+- Understanding tools beats exploit hunting  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+Wgel CTF proves one simple truth:
+
+> “If your SSH keys are public, your server already isn’t.”
+
+Slow start.  
+One mistake.  
+Free root.
+
+Easy box.  
+Very real lessons.
