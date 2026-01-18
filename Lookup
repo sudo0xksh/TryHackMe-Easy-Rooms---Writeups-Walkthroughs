@@ -1,0 +1,112 @@
+---
+
+Lookup - TryHackMe Writeup/Walkthrough
+Lookup - THM Writeup
+
+---
+
+Machine Overview
+Machine Name: Lookup
+ Target IP: 10.10.xxx.xxx (IP changed multiple times during the lab)
+ Operating System: Linux (Ubuntu-based)
+This assessment focused on web application enumeration, credential discovery through fuzzing, exploitation of a vulnerable file manager, and privilege escalation via misconfigured sudo permissions.
+
+---
+
+1️⃣ Initial Reconnaissance
+The engagement began with a TCP scan to identify exposed services and understand the attack surface.
+🔍 Nmap Scan
+nmap -sC -sV 10.10.xxx.xxx
+📌 Key Findings
+The following services were identified:
+Port 22 (SSH)
+ Service: OpenSSH 8.2p1
+ OS: Ubuntu Linux
+Port 80 (HTTP)
+ Service: Apache httpd 2.4.41
+ Redirect: lookup.thm
+
+The presence of a hostname redirect indicated a virtual host–based web application, making HTTP the primary entry point.
+
+---
+
+2️⃣ Web Application Enumeration
+Accessing the web application revealed a login page, confirming that authentication was a core component of the application.
+Initial automated testing was performed to quickly identify common vulnerabilities:
+SQL injection testing
+Command injection testing
+
+Both automated and manual testing did not reveal any direct injection vulnerabilities.
+At this stage, the focus shifted from exploitation to credential discovery.
+
+---
+
+3️⃣ Username & Credential Discovery
+Parallel fuzzing was performed against the authentication mechanism.
+Through targeted enumeration:
+Multiple valid usernames were identified
+Notably: admin and jose
+
+A password discovered during fuzzing attempts did not work for the admin user, but reusing the same credential for jose resulted in a successful login.
+This confirmed weak credential hygiene and user-specific password reuse.
+
+---
+
+4️⃣ Initial Foothold via Application Vulnerability
+Once authenticated, further inspection of the application revealed the use of elFinder, a web-based file manager.
+The installed version of elFinder was vulnerable and allowed remote code execution.
+By exploiting this vulnerability, a reverse shell was obtained, resulting in an initial foothold on the system.
+
+---
+
+5️⃣ Shell Stabilization & Enumeration
+After stabilizing the shell, post-exploitation enumeration was performed to identify lateral movement and escalation paths.
+Inspection of system binaries revealed access to a list of executables located under /usr/sbin.
+These binaries became a point of interest for further access.
+
+---
+
+6️⃣ SSH Access
+Credential testing against the SSH service was performed using discovered information.
+A valid password was identified, allowing SSH access to the system.
+At this stage:
+Stable SSH access obtained
+user.txt flag retrieved and submitted
+
+---
+
+7️⃣ Privilege Escalation
+Privilege escalation enumeration revealed that the current user had permission to run the following binary with sudo privileges:
+look
+While look is typically a harmless utility, its behavior allows reading arbitrary files when misconfigured.
+Cross-referencing its behavior confirmed that it could be abused to read sensitive files with elevated privileges.
+
+---
+
+8️⃣ Root Access
+Using the permitted look command, the root flag was read directly.
+Root access effectively achieved
+root.txt retrieved and submitted
+Full system compromise confirmed
+
+This concluded the assessment.
+
+---
+
+🧠 Key Takeaways
+
+Authentication mechanisms are often the weakest link in web applications
+Username enumeration significantly reduces attack complexity
+Credential reuse across users remains a critical security flaw
+Third-party components like file managers frequently introduce RCE vectors
+Misconfigured sudo permissions can trivialize privilege escalation
+
+---
+
+📬 Contact & Projects
+Email: dakshbaweja20@gmail.com
+ GitHub: https://github.com/sudo0xksh
+🚀 Deteroid
+Deteroid is a dedicated review platform for bug bounty hunters to share insights, rate programs, and collaborate on cybersecurity findings.
+ Empowering ethical hackers with community-driven intel to hunt bugs smarter.
+📸 Instagram: https://www.instagram.com/deteroids/
