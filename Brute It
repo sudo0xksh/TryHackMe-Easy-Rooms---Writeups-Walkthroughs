@@ -1,0 +1,156 @@
+# Brute It — TryHackMe (Easy) 🧱🔨🐧
+
+Brute It is that box which looks simple…  
+acts simple…  
+and then politely asks you: **“username aur password try karega?”**
+
+No fancy bugs.  
+No exploit wizardry.  
+Just web enum, credential pain, and sudo being sudo.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Brute It  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine revolves around **web enumeration**, **credential brute forcing**,  
+and a **misconfigured sudo setup** that ends the story quickly.
+
+Name checks out. ✅
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the mandatory “what did you expose?” scan.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Open ports discovered:
+
+22/tcp   SSH     tcpwrapped 🔐  
+80/tcp   HTTP    Apache 2.4.29 🌐  
+
+Linux 4.x kernel detected.  
+Only SSH and HTTP in play — clean, minimal, suspicious.
+
+With SSH locked behind creds, the web service instantly became the main suspect.
+
+---
+
+## Web Enumeration (Port 80) 🌐🐢
+
+Started enumerating the HTTP service.
+
+Immediately noticed something odd:
+
+- Scans were **slow**
+- Enumeration felt **throttled**
+- Tools were not having a good time
+
+Instead of smashing Gobuster like a caveman, the approach switched to:
+
+👉 **Manual inspection**
+
+The website itself was minimal, but authentication was clearly involved.
+
+No uploads.  
+No fancy functionality.  
+Just one clear message:
+
+**“Credentials matter here.”**
+
+---
+
+## Credential Attack Strategy 🧠🎯
+
+Given the situation:
+
+- No obvious vulnerabilities  
+- SSH locked behind authentication  
+- Web app hinting at login logic  
+
+The most logical plan became:
+
+👉 Identify valid usernames via the website  
+👉 Perform **controlled brute-force attempts**
+
+The machine name literally said *Brute It* — subtlety was not invited.
+
+---
+
+## Initial Access 🔑😎
+
+Through careful enumeration and credential testing:
+
+- Valid credentials were discovered  
+- SSH login was successful  
+
+Results:
+- User-level shell obtained  
+- user.txt flag captured  
+
+Partial compromise achieved.  
+Time to disrespect sudo.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration began.
+
+Checked sudo permissions.
+
+And of course…
+
+👉 The user could run certain commands as root **without a password**.
+
+The command list looked limited — but limited ≠ safe.
+
+Cross-checked allowed binaries with known techniques.
+
+GTFOBins smiled back 😈
+
+---
+
+## Root Access 🏁👑
+
+By abusing the allowed sudo configuration:
+
+- Root shell obtained  
+- Root privileges confirmed  
+- root.txt flag captured  
+
+Full system compromise achieved.
+
+No kernel exploits.  
+No tricks.  
+Just **bad sudo decisions**.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Even minimal web apps can enable brute-force paths  
+- Slow enumeration ≠ secure service  
+- SSH is only as strong as its credentials  
+- Misconfigured sudo is still a golden ticket  
+- Simple setups often fall the hardest  
+
+---
+
+## Final Words ☕😌
+
+Brute It teaches one honest lesson:
+
+> “If credentials are weak, everything else is optional.”
+
+Patient enumeration.  
+Basic logic.  
+Free root.
+
+Easy box.  
+Straightforward mistakes.
