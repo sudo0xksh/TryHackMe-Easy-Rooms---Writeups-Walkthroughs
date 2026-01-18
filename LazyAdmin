@@ -1,0 +1,175 @@
+# LazyAdmin — TryHackMe (Easy) 🛋️😴🐧
+
+LazyAdmin is exactly what the name promises.  
+An admin so relaxed that the server basically hacks itself.
+
+Outdated CMS.  
+Backup files on the internet.  
+File upload with zero trust issues.
+
+Free root. No complaints.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: LazyAdmin  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine revolves around **web enumeration**, **abusing an outdated CMS**,  
+**credential disclosure via backup files**, and a smooth ride to root.
+
+The admin did the heavy lifting. We just showed up.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the usual “what did you expose today?” scan.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Services discovered:
+
+22/tcp   SSH     OpenSSH 7.2p2 🔐  
+80/tcp   HTTP    Apache 2.4.18 🌐  
+
+Linux 4.x kernel detected.  
+Only SSH and HTTP open — clean, boring… or so it seemed.
+
+---
+
+## Web Enumeration (Port 80) 🌐🧐
+
+Visiting the website showed the **default Apache page**.
+
+Which usually means:
+👉 The real app is hiding somewhere else.
+
+Directory enumeration was performed and eventually revealed something juicy 👀
+
+An **outdated SweetRice CMS** installation.
+
+At that moment, the box’s fate was sealed.
+
+---
+
+## CMS Analysis & Credential Disclosure 🍚💀
+
+Digging into SweetRice vulnerabilities revealed something beautiful:
+
+👉 **Backup file disclosure**
+
+Backup files were accessible publicly.  
+Downloaded without authentication.  
+No resistance. Zero shame.
+
+Inside those backups?
+
+- Configuration files  
+- **Manager credentials**  
+
+No brute force.  
+No guessing.  
+Just straight-up leaked admin access.
+
+---
+
+## Admin Panel Access 🔑😎
+
+Used the recovered credentials to log into the SweetRice admin panel.
+
+Result:
+- Admin access confirmed  
+- Full CMS control achieved  
+
+From here, server-side access was just a formality.
+
+---
+
+## Initial Access via File Upload 📂💣
+
+The CMS allowed file uploads with basically no validation.
+
+Which meant one thing:
+
+👉 Upload a malicious `.phtml` file.
+
+Triggered the uploaded file and boom 💥
+
+- Reverse shell obtained  
+- Initial foothold secured  
+- First flag captured  
+
+Server officially unhappy.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration followed.
+
+Misconfigurations were everywhere.  
+Trust was misplaced.  
+Boundaries were imaginary.
+
+Without any kernel exploits or fancy tricks:
+
+👉 Root privileges were obtained.
+
+---
+
+## Root Access 🏁👑
+
+- Root access confirmed  
+- Root flag captured  
+- Full system compromise achieved  
+
+LazyAdmin lived up to the name.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Outdated CMS installations are free real estate  
+- Backup files should NEVER be public  
+- Credential disclosure kills security instantly  
+- Poor file upload validation = instant RCE  
+- Simple laziness can destroy an entire system  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+LazyAdmin teaches one eternal truth:
+
+> “If the admin is lazy, attackers don’t have to work.”
+
+Basic enumeration.  
+Public backups.  
+Free root.
+
+Easy box.  
+Painful mistakes.
