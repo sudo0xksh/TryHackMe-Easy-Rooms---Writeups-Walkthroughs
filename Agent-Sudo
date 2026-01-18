@@ -1,0 +1,161 @@
+# Agent Sudo — TryHackMe (Easy) 🕵️‍♂️💥
+
+Agent Sudo is one of those machines that doesn’t fight back.  
+It just **gives up** if you ask nicely (or not so nicely).
+
+No zero-days.  
+No galaxy-brain exploits.  
+Just bad decisions stacked on top of worse decisions.
+
+Result?  
+👉 **Root access with minimum effort and maximum disappointment for the sysadmin.**
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+As always, started with the good old *“let’s see what you exposed to the internet”* scan.
+
+nmap -sC -sV -oN nmap.txt 10.10.9.71
+
+Open ports screaming for attention:
+
+21/tcp  FTP     vsftpd 3.0.3 📁  
+22/tcp  SSH     OpenSSH 7.6p1 🔐  
+80/tcp  HTTP    Apache 2.4.29 🌐  
+
+FTP + SSH together is like leaving your house keys under the doormat  
+…and then putting a sign saying **“keys under the mat btw”**.
+
+---
+
+## Web Enumeration (Port 80) 🌐🪦
+
+Visited the website.
+
+Found:
+- A very boring announcement page  
+- Zero input fields  
+- Zero creativity  
+
+Still did directory enumeration because trusting a website is a rookie mistake.
+
+dirsearch -u http://10.10.9.71 -e php,html,js
+
+What showed up:
+- .htaccess related files 📄  
+- /server-status endpoint (403 — *nice try Apache*)  
+
+Nothing exploitable here.  
+Web server basically said: **“I’m useless, go bother someone else.”**
+
+---
+
+## FTP Enumeration (Port 21) 📂😏
+
+FTP is exposed.  
+Anonymous login is disabled.  
+Admin feels safe.  
+Admin is wrong.
+
+Tried some basic credential guessing and boom 💥
+
+Valid FTP login:
+
+Username: chris  
+Password: crystal  
+
+Inside FTP?  
+Files casually mentioning internal users like it’s office gossip.
+
+Users leaked:
+- christ
+- james
+
+At this point the machine basically whispered:  
+**“Try these on SSH, I dare you.”**
+
+---
+
+## SSH Access (Port 22) 🔑😎
+
+Used the leaked usernames and password patterns.
+
+SSH said:  
+👉 *“Welcome bro.”*
+
+Successful login:
+
+Username: james  
+Password: hackerrules!  
+
+User shell obtained.  
+System integrity officially compromised.  
+Time to disrespect sudo.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+First rule after getting a shell:  
+**Always run sudo -l before celebrating.**
+
+sudo -l
+
+Output was interesting.  
+Sudo rules were restrictive…  
+…but not restrictive *enough* 😈
+
+Old sudo version + bad config = 🎁
+
+---
+
+## CVE-2019-14287 — Sudo Goes Brrr 💣😬
+
+This vulnerability allows privilege escalation by abusing **negative user IDs**.
+
+Yes, negative.  
+Because apparently someone thought that was a good idea.
+
+Exploit command:
+
+sudo -u#-1 /bin/bash
+
+System response:
+
+Root shell spawned ✅  
+Security controls: nonexistent ❌  
+Sysadmin’s hopes and dreams: shattered 💀
+
+---
+
+## Root Access 🏁👑
+
+- Root shell obtained  
+- Root directory accessed  
+- Root flag collected  
+
+Machine status: **Owned. Buried. Forgotten.**
+
+---
+
+## Key Takeaways 🧠📌
+
+- Credential reuse is still ruining lives  
+- FTP should’ve stayed in the 90s  
+- Old sudo + bad config = instant regret  
+- You don’t need elite exploits when basics are broken  
+
+---
+
+## Final Words ☕😌
+
+Agent Sudo is a reminder that:
+> “If your fundamentals suck, attackers won’t need talent.”
+
+Clean enumeration.  
+Basic thinking.  
+Free root.
+
+Easy box.  
+Easier mistakes.
