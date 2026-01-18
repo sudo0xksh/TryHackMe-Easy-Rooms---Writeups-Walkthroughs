@@ -1,0 +1,181 @@
+# Brooklyn Nine-Nine — TryHackMe (Easy) 🚔😂🐧
+
+Brooklyn Nine-Nine is an Easy Linux box that feels less like hacking  
+and more like binge-watching a sitcom where **everyone leaks credentials by accident**.
+
+No exploits.  
+No pain.  
+Just anonymous FTP, stego magic, and sudo doing sudo things.
+
+Nine-Nine! 🫡
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Brooklyn Nine-Nine  
+Target IP: 10.10.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine revolves around **poor access controls**, **theme-based credentials**,  
+and a **GTFOBins-certified privilege escalation** to wrap things up nicely.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with a standard TCP scan to see what the precinct left unlocked.
+
+nmap -sC -sV 10.10.xxx.xxx
+
+Open ports discovered:
+
+21/tcp   FTP     vsftpd 3.0.3 📂  
+22/tcp   SSH     OpenSSH 7.6p1 🔐  
+80/tcp   HTTP    Apache 2.4.29 🌐  
+
+Linux 4.x kernel detected.  
+FTP, SSH, and HTTP all exposed.
+
+But one thing screamed louder than Boyle at lunch time:
+
+👉 **Anonymous FTP was enabled**
+
+Yikes.
+
+---
+
+## Enumeration Weirdness 🤨⚠️
+
+While running Gobuster and extra scans, the box started acting… moody.
+
+- ICMP ping? Stable ✅  
+- Website? Accessible ✅  
+- Active enumeration tools? Randomly failing ❌  
+
+Instead of brute-forcing scans like a maniac, the approach shifted to **manual service inspection**.
+
+And that decision paid off.
+
+---
+
+## FTP Enumeration (Port 21) 📁😏
+
+Anonymous login worked without any resistance.
+
+Inside FTP, a single file was sitting there like it *wanted* to be read.
+
+File found:
+- note_to_jake.txt 📝
+
+Reading it revealed usernames straight out of the show:
+
+- jake  
+- amy  
+- holt  
+
+At this point, it was clear the machine was **theme-based**  
+(and probably hiding creds somewhere dumb).
+
+---
+
+## Credential Discovery via Steganography 🖼️🕵️‍♂️
+
+While poking around the web directory, an image popped up:
+
+brooklyn99.jpg
+
+No uploads.  
+No forms.  
+No exploits.
+
+So naturally… stego time 😈
+
+Used steghide to extract hidden data from the image.
+
+And boom 💥
+
+Extracted credential:
+
+Holt’s password:
+fluffydog12@ninenine
+
+Case closed.
+
+---
+
+## Initial Access via SSH 🔑😎
+
+Used the recovered credentials to SSH into the machine.
+
+Login successful.
+
+Results:
+- User-level shell obtained  
+- user.txt flag captured  
+
+Now it was time to go from **detective** to **commissioner**.
+
+---
+
+## Privilege Escalation 🚀🔥
+
+Post-exploitation enumeration showed that user **holt** had sudo permissions.
+
+One binary stood out immediately:
+
+👉 **nano**
+
+Normally harmless.  
+But with sudo?  
+Nano becomes… dangerous 😈
+
+Checked GTFOBins (as tradition demands).
+
+And yes — nano can escape into a shell when run with elevated privileges.
+
+---
+
+## Privilege Escalation via nano ✂️👑
+
+Using the GTFOBins technique, nano was abused to spawn a root shell.
+
+No kernel exploits.  
+No dirty tricks.  
+Just **sudo misconfiguration doing its job badly**.
+
+---
+
+## Root Access 🏁💀
+
+- Root shell obtained  
+- Root access confirmed  
+- root.txt flag captured  
+
+Case solved.  
+Perpetrator: bad configuration.
+
+---
+
+## Key Takeaways 🧠📌
+
+- Anonymous FTP is still a liability  
+- Usernames leaked through files kill security instantly  
+- Steganography is still very much alive  
+- Misconfigured sudo permissions = free root  
+- Simple mistakes beat complex vulnerabilities every time  
+
+---
+
+## Final Words ☕😌
+
+Brooklyn Nine-Nine proves one thing:
+
+> “You don’t need exploits when the system confesses.”
+
+Clean enumeration.  
+Good instincts.  
+Zero resistance.
+
+Easy box.  
+Nine-Nine! 🚔🔥
