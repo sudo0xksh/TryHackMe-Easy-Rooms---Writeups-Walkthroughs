@@ -1,0 +1,206 @@
+# Pyrat — TryHackMe (Easy) 🏴‍☠️🐍🔥
+
+Pyrat is what happens when someone says  
+“let’s just eval the input, what could go wrong?”
+
+Answer: **everything**.
+
+Custom Python service.  
+Raw input execution.  
+Git repo left behind like breadcrumbs.
+
+Clean. Weird. Fun.
+
+---
+
+## Machine Overview 🖥️📌
+
+Machine Name: Pyrat  
+Target IP: 10.81.xxx.xxx  
+Operating System: Ubuntu-based Linux  
+
+This machine focuses on **breaking a custom Python web service**,  
+**turning error messages into RCE**, and **abusing leftover Git metadata**  
+to walk straight into root.
+
+If you like reading error messages — this box loves you back.
+
+---
+
+## Initial Reconnaissance 🔍👀
+
+Started with the usual recon ritual.
+
+nmap -sC -sV 10.81.xxx.xxx
+
+Services discovered:
+
+22/tcp    SSH      OpenSSH 8.2p1 🔐  
+8000/tcp  HTTP-alt SimpleHTTP/0.6 (Python 3.11.2) 🐍  
+
+Port 8000 immediately acted… strange.
+
+Instead of HTML, it threw **Python errors** at my face.
+
+That’s never a good sign (for the server).
+
+---
+
+## Web Service Analysis (Port 8000) 🐍🧠
+
+Interacting with the service revealed chaos:
+
+- GET requests returned Python exceptions  
+- OPTIONS requests broke things  
+- Errors looked like this:
+
+name 'GET' is not defined  
+source code string cannot contain null bytes  
+
+Translation?
+
+👉 **User input was being treated as Python code.**
+
+Congratulations, you built a remote Python REPL.
+
+---
+
+## Command Execution via Network Interaction 📡💣
+
+Instead of using a browser, the service was tested directly.
+
+Raw socket interaction > fancy tools.
+
+By sending crafted input over the network:
+
+- Python expressions executed  
+- Commands ran on the system  
+- The service behaved like a cursed Python shell  
+
+At this point, RCE was basically confirmed.
+
+---
+
+## Initial Foothold 🐾😎
+
+Used the execution context to spawn a reverse shell.
+
+Results:
+- Stable shell obtained  
+- User-level access confirmed  
+
+The box officially belonged to us.
+
+Time to snoop.
+
+---
+
+## Post-Exploitation Enumeration 🔎🧠
+
+Standard enumeration kicked off.
+
+One directory instantly stood out:
+
+👉 **/opt/dev**
+
+Inside it?
+
+- A `.git` directory 👀  
+- Full Git metadata still present  
+
+If there’s a Git repo on prod,  
+there’s probably secrets inside.
+
+---
+
+## Credential Discovery via Git Metadata 🧬🔑
+
+Dug into the Git configuration and history.
+
+And of course…
+
+👉 **Hardcoded credentials** were found.
+
+User identified:
+- think  
+
+Used the credentials.
+
+Login result?
+
+✅ Success  
+✅ Switched user to think  
+
+Developers really do leave notes for attackers.
+
+---
+
+## Lateral Movement & Privilege Escalation 🔄🚀
+
+Continued inspecting the Git repo:
+
+- Internal notes  
+- Instructions  
+- References to admin-level access  
+
+Enough context was leaked to authenticate as **admin**.
+
+From there?
+
+Root access was inevitable.
+
+---
+
+## Root Access 🏁👑
+
+- Root privileges confirmed  
+- Root flag captured  
+- Full system compromise achieved  
+
+All because someone trusted eval().
+
+---
+
+## Key Takeaways 🧠📌
+
+- Custom services are attack surfaces, not features  
+- Error messages reveal backend logic  
+- Treating user input as code is a disaster  
+- Git repos should never ship with metadata  
+- Dev leftovers often contain everything attackers need  
+
+---
+
+## 📬 Contact & Projects 👨‍💻📎
+
+**Daksh Baweja**  
+📧 Email: dakshbaweja20@gmail.com  
+🐙 GitHub: https://github.com/sudo0xksh  
+🔗 LinkedIn: https://www.linkedin.com/in/dakshbaweja  
+
+---
+
+## 🚀 Deteroid 🔥
+
+**Deteroid** is a dedicated review platform for bug bounty hunters to  
+share insights, rate programs, and collaborate on real-world security findings.
+
+Empowering ethical hackers with **community-driven intel**  
+to hunt smarter, not harder.
+
+📸 Instagram: https://www.instagram.com/deteroids/
+
+---
+
+## Final Words ☕😌
+
+Pyrat proves one golden rule:
+
+> “If your app evals user input, attackers don’t need exploits.”
+
+One weird service.  
+One Git repo.  
+Free root.
+
+Easy box.  
+Very real dev mistakes.
